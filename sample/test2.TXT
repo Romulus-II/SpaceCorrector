@@ -1,0 +1,2 @@
+let'sseehow the programdeals with afile with an
+uppercase extension
