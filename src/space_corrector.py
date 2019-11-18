@@ -137,6 +137,7 @@ def recursive(xml, stack):
 
 def cleanXMLFile(file, new_file):
     in_tag = False
+    line_number = 1
     for line in file:
         opening_tag_indexes = []
         closing_tag_indexes = []
@@ -171,29 +172,42 @@ def cleanXMLFile(file, new_file):
                 in_tag = True
 
             if not in_tag:
-                split_words = wordninja.split(word)
-                # Check if a word has actually been split
-                if(len(split_words)>1):
-                    output = split_words[0]
-                    for i in range(1,len(split_words)):
-                        output_args = (output, split_words[i])
-                        output = ' '.join(output_args)
-                    # Output both words to new file
-                    print(word, "->", output)
-                    new_file.write(output)
-                    new_file.write(" ")
-                else:
-                    new_file.write(word)
-                    new_file.write(" ")
+                try:
+                    # Apparently words are being saved as "<p>ABD" where tags are
+                    # Connected to the word. FIND A WAY TO FIX
+                    if word.isupper():
+                        new_file.write(output)
+                        new_file.write(" ")
+                    else:
+                        split_words = wordninja.split(word)
+                        # Check if a word has actually been split
+                        if(len(split_words)>1):
+                            output = split_words[0]
+                            for i in range(1,len(split_words)):
+                                output_args = (output, split_words[i])
+                                output = ' '.join(output_args)
+                            # Output both words to new file
+                            print(word, "->", output)
+                            new_file.write(output)
+                            new_file.write(" ")
+                        else:
+                            new_file.write(word)
+                            new_file.write(" ")
+                except:
+                    print("Error caused by xml line number ",line_number)
             else:
-                new_file.write(word)
-                if '<' in word and '>' not in word:
-                    new_file.write(" ")
-                if '>' in word:
-                    in_tag = False
+                try:
+                    new_file.write(word)
+                    if '<' in word and '>' not in word:
+                        new_file.write(" ")
+                    if '>' in word:
+                        in_tag = False
+                except:
+                    print("Error caused by xml line number ",line_number)
             #if('>' in word):
             #    in_tag = False
         new_file.write('\n')
+        line_number+=1
     file.close()
     new_file.close()
     return
