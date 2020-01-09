@@ -16,6 +16,12 @@ def main(argv):
     #print("Performing operation on ", argv[1:])
     print()
 
+    # Add to README:
+    #  apostrophes are removed
+    #  Sam's - > Sam s
+
+
+    # Check if user if supplying something as an agrument
     if len(argv)>1:
 
         file_name = ' '.join(argv[1:])
