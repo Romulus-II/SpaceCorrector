@@ -1,5 +1,0 @@
-we need to parse this 
-hi all 
-this is just a test 
-to see if the parser 
-can deal with weird word alignment 

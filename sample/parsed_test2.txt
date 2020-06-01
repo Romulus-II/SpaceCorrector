@@ -1,2 +1,0 @@
-let's see how the program deals with a file with an 
-uppercase extension 
