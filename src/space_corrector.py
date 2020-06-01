@@ -1,5 +1,6 @@
 import unittest
 import sys
+import os
 import wordninja
 import xml.etree.ElementTree as ET
 import pickle
@@ -11,6 +12,9 @@ def printAvailableCommands():
 # main
 def main(argv):
     import getopt
+
+    os.chdir('../.')
+    print(os.getcwd())
 
     file_name = ""
     #print("Performing operation on ", argv[1:])
@@ -43,17 +47,18 @@ def main(argv):
                 printAvailableCommands()
                 return
 
-
-        file = open(file_name, "r", encoding="utf8")
+        input_file_name = './input/' + file_name
+        file = open(input_file_name, "r", encoding="utf8")
 
         # Rename new file to parsed_(input file name)
         new_file_args = ('parsed_',file_name)
         new_file_name = ''.join(new_file_args)
-        new_file = open(new_file_name, "w")
+        output_file_name = './output' + new_file_name
+        new_file = open(output_file_name, "w")
 
         if 'txt' in file_name or 'TXT' in file_name:
             print("Fixing spacing on txt file")
-            print(new_file_name, '\n')
+            print(output_file_name, '\n')
             cleanTextFile(file, new_file)
         elif 'xml' in file_name or 'XML' in file_name:
             if 'p' in action:
@@ -64,11 +69,11 @@ def main(argv):
                 ext = 'pkl'
                 new_file_args = (name,ext)
                 new_file_name = ''.join(new_file_args)
-                print(new_file_name, '\n')
+                print(output_file_name, '\n')
                 pickleXMLFile(file, new_file_name)
             else:
                 print("Fixing spacing on xml file")
-                print(new_file_name, '\n')
+                print(output_file_name, '\n')
                 cleanXMLFile(file, new_file)
         else:
             print("Invalid argument. Must be a txt file.")
