@@ -66,6 +66,7 @@ def main(argv):
                 ext = 'pkl'
                 new_file_args = (name,ext)
                 new_file_name = ''.join(new_file_args)
+                output_file_name = './output/' + new_file_name
                 print(output_file_name, '\n')
                 pickleXMLFile(file, new_file_name)
             else:
@@ -127,7 +128,7 @@ def pickleXMLFile(file, new_file):
                 for i in range(1,len(split_words)):
                     output_args = (output, split_words[i])
                     output = ' '.join(output_args)
-                #print(xml.text, "->", output)
+                print(xml.text, "->", output)
                 xml.text = output
     with open(new_file, 'wb') as f_handle:
         pickle.dump(stack, f_handle)
