@@ -1,46 +1,54 @@
+# Import necessary modules/libraries
 import unittest
 import sys
 import os
 import wordninja
 import xml.etree.ElementTree as ET
 import pickle
+import datetime
+
 
 def printAvailableCommands():
     print('--p   Create a pickle file from an xml file.')
 
+"""
+def isRegisteredCommand(s):
+    command_characters = ['p']
+    for com_char in command_characters:
+        if s in com_char:
+            return True
+    return False
+"""
 
 # main
 def main(argv):
     import getopt
 
     os.chdir('../.')
-    #print(os.getcwd())
 
     file_name = ""
-
-    # Add to README:
-    #  apostrophes are removed
-    #  Sam's - > Sam s
 
     # Check if user if supplying something as an agrument
     if len(argv)>1:
 
         file_name = ' '.join(argv[1:])
-        action = ''
-
         #print(file_name)
 
         # Checks to see if the user want to use a command
+        action = ''
         if '--' in file_name:
+            command_characters = ['p']
             #They want to output to something else:
+            # Add a try except
             index = file_name.find(' ')
+
             action = file_name[0:index+1]
             file_name = file_name[index+1:]
             if 'p' in action and '.xml' not in file_name and '.XML' not in file_name:
                 print("Invalid agruments: xml file required as input")
                 return
-            elif 'p' not in action:
-                print("Unknown command. Try: ")
+            else:
+                print("Unknown command, try: ")
                 printAvailableCommands()
                 return
 
@@ -53,6 +61,7 @@ def main(argv):
         output_file_name = './output/' + new_file_name
         new_file = open(output_file_name, "w")
 
+        # Perform different action based on file type
         if 'txt' in file_name or 'TXT' in file_name:
             print("Fixing spacing on txt file")
             print(output_file_name, '\n')
@@ -80,6 +89,32 @@ def main(argv):
         print("Please supply a command or input")
     return
 
+corrections = []
+errors = []
+
+def createLog():
+    time_created = str(datetime.datetime.now())
+    time_created = time_created.replace(':','.')
+    file_name = ('logs/' + time_created + '.txt')
+    print('\nSaving log data under ' + file_name)
+    log_file = open(file_name, "w")
+    log_file.write('Corrections:')
+    num_logging_exceptions = 0
+    for cor in corrections:
+        try:
+            log_file.write(cor + '\n')
+        except:
+            num_logging_exceptions += 1
+    log_file.write('\nErrors:')
+    for error in errors:
+        try:
+            log_file.write(error + '\n')
+        except:
+            num_logging_exceptions += 1
+    log_file.write('\nNumber of exceptions while loggins: ' + str(num_logging_exceptions))
+    log_file.close()
+
+
 def cleanTextFile(file, new_file):
     for line in file:
         words = line.split()
@@ -104,6 +139,7 @@ def cleanTextFile(file, new_file):
     file.close()
     new_file.close()
     return
+
 
 def pickleXMLFile(file, new_file):
     print(file, '->', new_file)
@@ -171,7 +207,7 @@ def cleanXMLFile(file, new_file):
         temp_word = ' '.join(final_line)
         words = temp_word.split()
         #words = line.split()
-        # A bit of preparsing to make sure tag endings are it's own separate words
+        # A bit of preparsing to make sure tag endings are its own separate words
         # Ex:
         # ['<item','name="item1">','Milk,'</item>']
         #   vs.
@@ -183,28 +219,36 @@ def cleanXMLFile(file, new_file):
 
             if not in_tag:
                 try:
-                    # Apparently words are being saved as "<p>ABD" where tags are
-                    # Connected to the word. FIND A WAY TO FIX
+                    # Apparently words are being saved as "<p>ABD", but only when
+                    #  the if statement if uncommented
+
+                    # Check if word is a course ID
+                    """
                     if word.isupper():
                         new_file.write(output)
                         new_file.write(" ")
                     else:
-                        split_words = wordninja.split(word)
-                        # Check if a word has actually been split
-                        if(len(split_words)>1):
-                            output = split_words[0]
-                            for i in range(1,len(split_words)):
-                                output_args = (output, split_words[i])
-                                output = ' '.join(output_args)
-                            # Output both words to new file
-                            print(word, "->", output)
-                            new_file.write(output)
-                            new_file.write(" ")
-                        else:
-                            new_file.write(word)
-                            new_file.write(" ")
+                    """
+                    split_words = wordninja.split(word)
+                    # Check if a word has actually been split
+                    if(len(split_words)>1):
+                        output = split_words[0]
+                        for i in range(1,len(split_words)):
+                            output_args = (output, split_words[i])
+                            output = ' '.join(output_args)
+                        # Output both words to new file
+                        print(word, "->", output)
+                        corrections.append('Changed ' + word + ' --> '\
+                                + output)
+                        new_file.write(output)
+                        new_file.write(" ")
+                    else:
+                        new_file.write(word)
+                        new_file.write(" ")
                 except:
                     print("Error caused by xml line number ",line_number)
+                    errors.append(word + ' in line ' + str(line_number) + ' in '\
+                            + file)
             else:
                 try:
                     new_file.write(word)
@@ -220,6 +264,7 @@ def cleanXMLFile(file, new_file):
         line_number+=1
     file.close()
     new_file.close()
+    createLog()
     return
 
 if __name__ == '__main__':

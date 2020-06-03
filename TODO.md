@@ -1,3 +1,8 @@
-Find a way to identify and skip over course ids
+###Things to Fix:
+* Fix pickling of xml files (pickleXMLFile)
+* Words connected tags disappear when the xml is parsed: need a way to split it
+from the tag
+* Find a way to distinguish course IDs in "word clusters"
 
-Fix rendering of words after tags as 1 word.
+###Possible Additions:
+* Stop words?
