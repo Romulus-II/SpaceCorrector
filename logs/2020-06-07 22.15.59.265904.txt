@@ -1,0 +1,5 @@
+Corrections:Changed ABC this isjusta test --> ABC this is just a test
+Changed Don't mind-me --> Don't mind me
+
+Errors:
+Number of exceptions while loggins: 0

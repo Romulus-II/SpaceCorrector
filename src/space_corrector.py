@@ -44,9 +44,11 @@ def main(argv):
 
             action = file_name[0:index+1]
             file_name = file_name[index+1:]
-            if 'p' in action and '.xml' not in file_name and '.XML' not in file_name:
-                print("Invalid agruments: xml file required as input")
-                return
+
+            if 'p' in action:
+                if '.xml' not in file_name and '.XML' not in file_name:
+                    print("Invalid agruments: xml file required as input")
+                    return
             else:
                 print("Unknown command, try: ")
                 printAvailableCommands()
@@ -75,15 +77,20 @@ def main(argv):
                 ext = 'pkl'
                 new_file_args = (name,ext)
                 new_file_name = ''.join(new_file_args)
-                output_file_name = './output/' + new_file_name
+                output_file_name = './pickles/' + new_file_name
                 print(output_file_name, '\n')
-                pickleXMLFile(file, new_file_name)
+                pickleXMLFile(file, output_file_name)
             else:
                 print("Fixing spacing on xml file")
                 print(output_file_name, '\n')
                 cleanXMLFile(file, new_file)
+            #createLog()
         else:
-            print("Invalid argument. Must be a txt file.")
+            print("Invalid argument. Must include file.")
+            return
+
+        # After parsing is complete
+        createLog()
 
     else:
         print("Please supply a command or input")
@@ -128,6 +135,8 @@ def cleanTextFile(file, new_file):
                     output = ' '.join(output_args)
                 # Output both words to new file
                 print(word, "->", output)
+                corrections.append('Changed ' + word + ' --> '\
+                        + output)
                 new_file.write(output)
                 new_file.write(" ")
             else:
@@ -142,8 +151,8 @@ def cleanTextFile(file, new_file):
 
 
 def pickleXMLFile(file, new_file):
-    print(file, '->', new_file)
-        # Get xml (tree) into a list (stack) and find courses (courseID & descriptions)
+    #print(file, '->', new_file)
+    # Get xml (tree) into a list (stack) and find courses (courseID & descriptions)
     tree = ET.parse(file)
     text = tree.getroot()
     courseID = []
@@ -165,10 +174,12 @@ def pickleXMLFile(file, new_file):
                     output_args = (output, split_words[i])
                     output = ' '.join(output_args)
                 print(xml.text, "->", output)
+                corrections.append('Changed ' + xml.text + ' --> '\
+                        + output)
                 xml.text = output
     with open(new_file, 'wb') as f_handle:
         pickle.dump(stack, f_handle)
-    print("FIN")
+        f_handle.close()
     return
 
 def recursive(xml, stack):
